@@ -71,18 +71,43 @@ export const signUp = async function (req,res) {
 }
 
 export const logIn = async function (req,res) {
-  const user = req.body;
+  const { email, password } = req.body;
 
   try {
+    const user = await User.findOne({ email });
     
+    if(user) {
+      const checkPassword = await bcrypt.compare(password, user.password);
+      if(checkPassword) {
+        generateTokenAndSetCookie(user._id, res);
+        return res.status(201).json({
+          _id: user.id,
+          name: user.name,
+          userName: user.userName,
+          email: user.email,
+          followers: user.followers,
+          following: user.following,
+          profileImage: user.profileImage,
+          bannerImage: user.bannerImage,
+        });
+      } else {
+        return res.status(400).json({message: 'Invalid credentials'});
+      }
+    } else {
+      return res.status(404).json({message: 'User not found'})
+    }
   } catch (error) {
     console.error(`Error occured in oauth login: ${error.message}}`);
+    return res.status(500).json({message: 'Server error'});
   }
 }
 
 export const logOut = async function (req,res) {
-  res.json({
-    message: 'Reached logOut endpoint'
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
   })
+  return res.status(200).json({message: 'Logged out successfully'});
 }
 
