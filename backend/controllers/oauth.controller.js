@@ -74,8 +74,8 @@ export const logIn = async function (req,res) {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
-    
+    const user = await User.findOne( {email} );
+    console.log(user);
     if(user) {
       const checkPassword = await bcrypt.compare(password, user.password);
       if(checkPassword) {
@@ -94,7 +94,7 @@ export const logIn = async function (req,res) {
         return res.status(400).json({message: 'Invalid credentials'});
       }
     } else {
-      return res.status(404).json({message: 'User not found'})
+      return res.status(404).json({message: 'User not found'});
     }
   } catch (error) {
     console.error(`Error occured in oauth login: ${error.message}}`);

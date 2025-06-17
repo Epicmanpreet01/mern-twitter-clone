@@ -18,8 +18,7 @@ const userSchema = new Schema({
     type: String,
     required: true,
     minLength: 8,
-    maxLength: 128,
-    select: false // Exclude password from queries by default
+    maxLength: 128
   },
 
   followers: {
