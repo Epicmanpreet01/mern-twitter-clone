@@ -1,12 +1,21 @@
 import express from 'express';
 import { config } from 'dotenv';
 import cookieParser from 'cookie-parser';
+import {v2 as cloudinary} from 'cloudinary';
 
 import oauthRoutes from './routes/oauth.routes.js';
 import userRoutes from './routes/user.routers.js';
 
 import db from './config/db.js';
+
+
 config()
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 const PORT = process.env.PORT;
 
 const app = express();

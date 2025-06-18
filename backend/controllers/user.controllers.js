@@ -1,4 +1,6 @@
 import User from '../models/user.model.js';
+import bcrypt from 'bcryptjs';
+import { v2 as cloudinary } from 'cloudinary';
 
 export const getUserProfile = async function(req,res) {
   const {userName} = req.params;
@@ -64,29 +66,94 @@ export const followUnfollowUser = async function(req,res) {
 }
 
 export const updateProfile = async function(req,res) {
-  const user = req.user;
-  const newUser = req.body;
+  let { name, userName, email, currentPassword, newPassword, bio, link } = req.body;
+  const { profileImage, bannerImage } = req.body;
 
-  if(!user) {
-    return res.status(401).json({error: 'User unauthorized'});
-  }
-
-  if(!newUser || Object.keys(newUser).length === 0) {
-    return res.status(400).json({error: 'No data provided to update'});
-  }
-
-  const doesExist = await User.findOne({userName: newUser.userName});
-  if(doesExist && doesExist._id.toString() !== user._id.toString()) {
-    return res.status(400).json({error: 'Username already exists'});
-  }
-
-  const userId = user._id;
-
+  const userId = req.user._id;
+  
   try {
-    const updatedUser = await User.findByIdAndUpdate(userId, newUser, {new: true}).select('-password');
+    let user = await User.findById(userId);
 
-    res.status(200).json({message: 'Profile updated successfully', data: updatedUser});
-    
+    if(!user) {
+      return res.status(404).json({error: 'User not found'});
+    }
+
+    //Password validation
+    if((!currentPassword && newPassword) || (currentPassword && !newPassword)) {
+      return res.status(400).json({error: 'Both current and new password are required'});
+    }
+
+    if(currentPassword && newPassword) {
+
+      if(currentPassword === newPassword) {
+        return res.status(400).json({error: 'Current password and new password cannot be the same'})
+      }
+
+      const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+      const validPassword = regex.test(newPassword);
+      if(!validPassword) {
+        return res.status(400).json({error: 'Invalid password format'});
+      }
+
+      const isPasswordCorrect = bcrypt.compare(currentPassword, user.password);
+
+      if(!isPasswordCorrect) {
+        return res.status(400).json({error: 'Current password is incorrect'});
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      newPassword = hashedPassword; // Update the password
+      await user.save();
+    }
+
+    //Profile Image
+    if(profileImage) {
+      if(user.profileImage) {
+        await cloudinary.uploader.destroy(user.profileImage.split('/').pop().split('.')[0]);
+      }
+
+      const uploadedProfileImage = await cloudinary.uploader.upload(profileImage);
+      profileImage = uploadedProfileImage.secure_url;
+    }
+
+    //Banner Image
+    if(bannerImage) {
+      if(user.bannerImage) {
+        await cloudinary.uploader.destroy(user.bannerImage.split('/').pop().split('.')[0]);
+      }
+      const uploadedBannerImage = await cloudinary.uploader.upload(bannerImage);
+      bannerImage = uploadedBannerImage.secure_url;
+    }
+
+    if(userName) {
+      const doesExist = await User.findOne({ userName });
+      if(doesExist) return res.status(400).json({error: 'Username already exists'});
+    }
+
+    if(email) {
+      const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/
+      const valid = regex.test(email);
+      if(!valid) return res.status(400).json({error: 'Invalid email format'})
+    }
+
+    console.log('hello');
+
+    user.name = name || user.name;
+    user.userName = userName || user.userName;
+    user.email = email || user.email;
+    user.password = newPassword || user.password;
+    user.profileImage = profileImage || user.profileImage;
+    user.bannerImage = bannerImage || user.bannerImage;
+    user.bio = bio || user.bio;
+    user.link = link || user.link;
+
+    await user.save();
+
+    user.password = null;
+
+    return res.status(200).json({message: 'user profile updated', data: user});
+
   } catch (error) {
     console.error(`Error occured in updating profile: ${error.message}`);
     return res.status(500).json({error: error.message});
@@ -97,10 +164,24 @@ export const getSuggestedUsers = async function(req,res) {
 
   try {
     const user = req.user;
-    const followedUserIds = (await User.find( {_id: {$in: user.following}} ).select('_id')).map(user => user._id.toString());
-    const suggestedUsers = await User.find({
-      _id: { $nin: [...followedUserIds, user._id.toString()] }
-    }).select('-password').limit(10);
+    const usersFollowedByMe = await User.findById(user._id).select('following');
+    const users = await User.aggregate([
+      {
+        $match: {
+          _id: {$ne: user._id}
+        },
+      },
+      {$sample: {size: 10}}, // Randomly select 10 users
+    ])
+
+    const filteredUsers = users.filter(u => !usersFollowedByMe.following.includes(u._id.toString()));
+    const suggestedUsers = filteredUsers.slice(0,4); // Limit to 4 suggested users
+
+    suggestedUsers.forEach(user => user.password = null); // Remove password from suggested users
+
+    if(suggestedUsers.length === 0) {
+      return res.status(404).json({message: 'No suggested users found'});
+    }
 
     res.status(200).json({message: 'Suggested users fetched successfully', data: suggestedUsers});
 
