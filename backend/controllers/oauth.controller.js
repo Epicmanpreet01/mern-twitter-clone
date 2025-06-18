@@ -7,32 +7,21 @@ export const signUp = async function (req,res) {
   try {
     const {name,userName,email,password} = req.body;
 
-    //check for existing userName
-
     const existingUser = await User.findOne( {userName} )
 
-    if(existingUser) {
-      res.status(400).json({message: 'username already exists'});
-    }
-
-    //validate email and check for existing email
     let regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const validEmail = regex.test(email);
-    if(!validEmail) {
-      res.status(400).json({message: 'Invalid Email'})
-    }
 
     const existingEmail = await User.findOne( {email} )
-    if(existingEmail) {
-      res.status(400).json({message: 'username already exists'});
-    }
-
-    //validate password and hash
     regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
     const validPassword = regex.test(password);
 
-    if(!validPassword) {
-      res.status(400).json({message: 'Invalid password'});
+    if(existingEmail || existingUser) {
+      return res.status(400).json({message: 'User alreadyy exists'})
+    }
+
+    if(!validEmail || !validPassword) {
+      return res.status(400).json({message: 'Invalid email or password'});
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -75,7 +64,6 @@ export const logIn = async function (req,res) {
 
   try {
     const user = await User.findOne( {email} );
-    console.log(user);
     if(user) {
       const checkPassword = await bcrypt.compare(password, user.password);
       if(checkPassword) {
@@ -103,11 +91,38 @@ export const logIn = async function (req,res) {
 }
 
 export const logOut = async function (req,res) {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-  })
-  return res.status(200).json({message: 'Logged out successfully'});
+  try {
+    res.cookie('jwt','', {
+      maxAge: 0
+    })
+    return res.status(200).json({message: 'Logged out successfully'});
+  } catch (error) {
+    console.error(`Error occured in logOut: ${error.message}`);
+  }
 }
 
+export const getCurrUser = function (req,res) {
+  try {
+
+    const user = req.user;
+
+    if(!user) {
+      return res.status(401).json({message: "Unautharized Access"});
+    }
+
+    return res.status(200).json({
+      _id: user.id,
+      name: user.name,
+      userName: user.userName,
+      email: user.email,
+      followers: user.followers,
+      following: user.following,
+      profileImage: user.profileImage,
+      bannerImage: user.bannerImage,
+    })
+
+  } catch (error) {
+    console.error(`Error occured while fetching current user: ${error.message}`);
+    return res.status(500).json({message: 'Server Error'});
+  }
+}
