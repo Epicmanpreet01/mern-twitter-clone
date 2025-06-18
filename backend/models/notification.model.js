@@ -1,16 +1,23 @@
 import mongoose,{ Schema, model } from "mongoose";
 
 const notificationSchema = new Schema({
-  recipient: {
-    type: mongoose.Types.ObjectId,
-    required: true
+  from: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
-  sender: {
-    type: mongoose.Types.ObjectId,
-    required: true
+  to: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
-  subject: {
-    type: mongoose.Types.ObjectId,
+  read: {
+    type: Boolean,
+    default: false
+  },
+  type: {
+    type: String,
+    enum: ['follow', 'like', 'comment', 'mention', 'reply'],
     required: true
   }
 }, {

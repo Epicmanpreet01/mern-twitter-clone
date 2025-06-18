@@ -7,7 +7,8 @@ export const protectedRoutes = async function (req,res,next) {
     const token = req.cookies.jwt;
     if(!token) {
       req.user = null
-      next();
+      return res.status(401).json({error: 'Unauthorized access, please login to continue'});
+      // return res.redirect('/login');
     }
     const isTokenValid = jwt.verify(token, process.env.JWT_SECRET);
     if(isTokenValid) {
@@ -16,6 +17,7 @@ export const protectedRoutes = async function (req,res,next) {
       next();
     }
   } catch (error) {
+    
     console.log(`Error occured while routing protected routes: ${error.message}`);
   }
 }
