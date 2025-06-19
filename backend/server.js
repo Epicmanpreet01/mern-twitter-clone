@@ -3,9 +3,10 @@ import { config } from 'dotenv';
 import cookieParser from 'cookie-parser';
 import {v2 as cloudinary} from 'cloudinary';
 
-import oauthRoutes from './routes/oauth.routes.js';
-import userRoutes from './routes/user.routers.js';
-import tweetRoutes from './routes/posts.routes.js';
+import oauthRoutes from './routes/oauth.route.js';
+import userRoutes from './routes/user.route.js';
+import tweetRoutes from './routes/posts.route.js';
+import notificationRoutes from './routes/notification.route.js';
 
 import db from './config/db.js';
 
@@ -30,6 +31,7 @@ app.use(cookieParser());
 app.use('/api/oauth', oauthRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/post', tweetRoutes);
+app.use('/api/notification', notificationRoutes);
 
 app.get('/', (req,res) => {
   res.status(200).send('Hello to root')
