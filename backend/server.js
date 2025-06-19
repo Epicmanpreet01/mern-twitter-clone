@@ -5,6 +5,7 @@ import {v2 as cloudinary} from 'cloudinary';
 
 import oauthRoutes from './routes/oauth.routes.js';
 import userRoutes from './routes/user.routers.js';
+import tweetRoutes from './routes/posts.routes.js';
 
 import db from './config/db.js';
 
@@ -28,6 +29,7 @@ app.use(cookieParser());
 //use routes
 app.use('/api/oauth', oauthRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/post', tweetRoutes);
 
 app.get('/', (req,res) => {
   res.status(200).send('Hello to root')

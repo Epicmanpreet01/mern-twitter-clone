@@ -1,4 +1,6 @@
 import User from '../models/user.model.js';
+import Notification from '../models/notification.model.js';
+
 import bcrypt from 'bcryptjs';
 import { v2 as cloudinary } from 'cloudinary';
 
@@ -21,7 +23,7 @@ export const getUserProfile = async function(req,res) {
 
 export const followUnfollowUser = async function(req,res) {
   const { id } = req.params;
-  const otherUser  = await User.findById(id);
+  const otherUser  = await User.findById(id).select('-password');
   const currUser = req.user;
 
   if(!otherUser) {

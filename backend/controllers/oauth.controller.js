@@ -7,12 +7,12 @@ export const signUp = async function (req,res) {
   try {
     const {name,userName,email,password} = req.body;
 
-    const existingUser = await User.findOne( {userName} )
+    const existingUser = await User.findOne( {userName} ).select('-password');
 
     let regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const validEmail = regex.test(email);
 
-    const existingEmail = await User.findOne( {email} )
+    const existingEmail = await User.findOne( {email} ).select('-password');
     regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
     const validPassword = regex.test(password);
 
