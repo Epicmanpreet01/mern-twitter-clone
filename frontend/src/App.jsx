@@ -4,6 +4,8 @@ import SignUpPage from './pages/auth/signUp/SignUpPage.jsx'
 import HomePage from './pages/home/HomePage.jsx'
 import SideBar from './components/common/SideBar.jsx'
 import RightPanel from './components/common/RightPanel.jsx'
+import NotificationPage from './pages/notification/NotificationPage.jsx'
+import ProfilePage from './pages/profile/ProfilePage.jsx'
 
 function App() {
 
@@ -14,6 +16,8 @@ function App() {
         <Route path='/' element={<HomePage />}/>
         <Route path='/SignUp' element={<SignUpPage />}/>
         <Route path='/LogIn' element={<LogInPage />}/>
+        <Route path='/notifications' element={<NotificationPage />} />
+        <Route path='/profile/:userName' element={<ProfilePage />} />
       </Routes>
       <RightPanel />
     </div>
