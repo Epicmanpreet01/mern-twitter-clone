@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: cupcake --default, twitterCloneDark --preferdark; 
-  primary: rgb(29, 155, 240),
-  secondary: rgb(24, 24, 24)
+  themes: cupcake --default, twitterCloneDark --preferdark;
 }
 
 @plugin "daisyui/theme" {
