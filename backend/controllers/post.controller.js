@@ -8,7 +8,7 @@ export const getPosts = async function(req,res) {
   const user = req.user;
 
   try {
-    const posts = await Post.find({}).sort({createdAt: -1}).populate({
+    const posts = await Post.find({parentId: null}).sort({createdAt: -1}).populate({
       path: 'poster',
       select: '-password'
     }).populate({
@@ -19,7 +19,7 @@ export const getPosts = async function(req,res) {
       }
     })
 
-    if(posts.length === 0) return res.status(200).json({message: 'No liked posts', data:[]});
+    if(posts.length === 0) return res.status(200).json({error: 'No liked posts', data:[]});
 
     res.status(200).json({message: 'Posts Found', data: posts});
   } catch (error) {
@@ -44,7 +44,7 @@ export const getLikedPosts = async function(req,res) {
       }
     })
 
-    if(posts.length === 0) return res.status(200).json({message: 'No liked posts', data:[]});
+    if(posts.length === 0) return res.status(200).json({error: 'No liked posts', data:[]});
 
     res.status(200).json({message: 'Posts Found', data: posts});
   } catch (error) {
@@ -69,7 +69,7 @@ export const getFollowingPosts = async function(req,res) {
       }
     });
 
-    if(followingUserPosts.length === 0) return res.status(200).json({message: 'No posts available', data:[]});
+    if(followingUserPosts.length === 0) return res.status(200).json({error: 'No posts available', data:[]});
 
     res.status(200).json({message: 'Posts Found', data: followingUserPosts});
 
@@ -99,7 +99,7 @@ export const getUserPosts = async function(req,res) {
       }
     });
 
-    if(!otherUserPosts) return res.status(404).json({message: 'User has no posts', data:[]});
+    if(!otherUserPosts) return res.status(404).json({error: 'User has no posts', data:[]});
 
     return res.status(200).json({message: 'User posts fetched successfully', data: otherUserPosts});
 

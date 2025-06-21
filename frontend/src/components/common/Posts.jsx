@@ -1,9 +1,32 @@
 import Post from "./Post";
 import PostSkeleton from "../skeletons/PostSkeleton";
-import { POSTS } from "../../utils/db/dummy";
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios';
 
-const Posts = () => {
-	const isLoading = false;
+const Posts = ({ feedtype }) => {
+	// const isLoading = false;
+
+	const getPostEndpoint = () => {
+		if (feedtype === 'forYou') return '/api/post/all';
+		if (feedtype === 'following') return '/api/post/following';
+		return '/api/post/all';
+	};
+
+	const POSTS_ENDPOINT = getPostEndpoint();
+
+	const { data: posts, isLoading} = useQuery({
+		queryKey: ['posts', feedtype], // <-- dynamic key based on feedtype
+		queryFn: async () => {
+			try {
+				const res = await axios(getPostEndpoint());
+				return res.data.data;
+			} catch (error) {
+				console.log(`Error occurred while fetching posts: ${error.message}`);
+			}
+		},
+		retry: false
+	});
+
 
 	return (
 		<>
@@ -14,10 +37,10 @@ const Posts = () => {
 					<PostSkeleton />
 				</div>
 			)}
-			{!isLoading && POSTS?.length === 0 && <p className='text-center my-4'>No posts in this tab. Switch 👻</p>}
-			{!isLoading && POSTS && (
+			{!isLoading && posts?.length === 0 && <p className='text-center my-4'>No posts in this tab. Switch 👻</p>}
+			{!isLoading && posts && (
 				<div>
-					{POSTS.map((post) => (
+					{posts.map((post) => (
 						<Post key={post._id} post={post} />
 					))}
 				</div>
