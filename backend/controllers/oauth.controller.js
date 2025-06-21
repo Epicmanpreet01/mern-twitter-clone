@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import { generateTokenAndSetCookie } from '../lib/utils/generateToken.js';
 
 export const signUp = async function (req,res) {
-
   try {
     const {name,userName,email,password} = req.body;
 
@@ -17,7 +16,7 @@ export const signUp = async function (req,res) {
     const validPassword = regex.test(password);
 
     if(existingEmail || existingUser) {
-      return res.status(400).json({message: 'User alreadyy exists'})
+      return res.status(400).json({message: 'User already exists'})
     }
 
     if(!validEmail || !validPassword) {
@@ -98,6 +97,7 @@ export const logOut = async function (req,res) {
     return res.status(200).json({message: 'Logged out successfully'});
   } catch (error) {
     console.error(`Error occured in logOut: ${error.message}`);
+    return res.status(500).json({message: 'Server error'});
   }
 }
 
