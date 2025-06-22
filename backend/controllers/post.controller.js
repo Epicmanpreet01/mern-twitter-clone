@@ -220,6 +220,8 @@ export const commentOnPost = async function(req,res) {
     await notification.save();
     await Post.findByIdAndUpdate(postId, {$push: {comments: comment._id}});
 
+    await comment.populate("poster", "name userName profileImage");
+
     return res.status(200).json({message: 'Commented Successfully', data: comment});
 
   } catch (error) {

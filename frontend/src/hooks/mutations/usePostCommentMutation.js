@@ -3,7 +3,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 
-export default function usePostCommentMutation(feedtype,) {
+export default function usePostCommentMutation(feedtype,post) {
+  
   const QueryClient = useQueryClient();
   return useMutation({
     mutationFn: async({id,commentData}) => {
@@ -18,8 +19,18 @@ export default function usePostCommentMutation(feedtype,) {
         throw error
       }
     },
-    onSuccess: () => {
-      QueryClient.invalidateQueries({queryKey: ['posts', feedtype]});
+    onSuccess: (commentData) => {
+      QueryClient.setQueryData(['posts', feedtype], (oldposts) => {
+        if (!oldposts) return oldposts;
+
+        return oldposts.map(p => {
+          if (p._id === post._id) {
+            const updatedComments = Array.isArray(p.comments) ? [...p.comments, commentData] : [commentData];
+            return { ...p, comments: updatedComments };
+          }
+          return p;
+        });
+      });
     },
     onError: (error) => {
       console.error(`Error occured in mutation: ${error.message}`);

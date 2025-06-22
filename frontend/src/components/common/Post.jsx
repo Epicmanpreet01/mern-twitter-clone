@@ -23,7 +23,7 @@ const Post = ({ post,feedtype }) => {
 	const {data:authUser} = useAuthUser();
 	const {mutate:deletePostMutuation, isPending:deletePending} = useDeletePostMutation(feedtype);
 	const {mutate:likePostMutation, isPending:isLiking} = useLikePostMutation(feedtype,post);
-	const {mutate:postComment, isPending} = usePostCommentMutation(feedtype);
+	const {mutate:postComment, isPending} = usePostCommentMutation(feedtype, post);
 
 	const postOwner = post.poster;
 	const isLiked = post.likes.includes(authUser._id);
