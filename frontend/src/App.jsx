@@ -28,7 +28,14 @@ function App() {
         <Route path='/profile/:userName' element={authUser? <ProfilePage /> : <Navigate to={'/LogIn'} />} />
       </Routes>
       {authUser && <RightPanel />}
-      <Toaster />
+      <Toaster
+        position='top-center'
+        toastOptions={{
+          style: {
+            zIndex: 9999
+          }
+        }}
+      />
     </div>
   )
 }

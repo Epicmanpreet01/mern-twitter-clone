@@ -22,7 +22,7 @@ const Post = ({ post,feedtype }) => {
 	const {data:authUser} = useAuthUser();
 	const {mutate:deletePostMutuation, isPending:deletePending} = useDeletePostMutation(feedtype);
 	const {mutate:likePostMutation} = useLikePostMutation(feedtype);
-	const {mutate:postComment} = usePostCommentMutation(feedtype);
+	const {mutate:postComment, isPending} = usePostCommentMutation(feedtype);
 
 	const postOwner = post.poster;
 	const isLiked = post.likes.includes(authUser._id);
@@ -31,11 +31,6 @@ const Post = ({ post,feedtype }) => {
 	const [img, setImg] = useState(null);
 	const imgRef = useRef(null);
 
-	const isError = false;
-
-	const data = {
-		profileImg: "/avatars/boy1.png",
-	};
 
 
 	const handleImgChange = (e) => {
@@ -50,21 +45,22 @@ const Post = ({ post,feedtype }) => {
 	};
 
 	const isMyPost = postOwner._id === authUser._id;
-	const isPending = false
-	const formattedDate = "1h";
+	const formattedDate = new Date(post.createdAt).toLocaleString();
 
 	const handleDeletePost = (id) => {
 		deletePostMutuation(id)
 	};
 
 	const handlePostComment = (e,id) => {
+		setImg(null);
+		setText('');
 		e.preventDefault();
 		const commentData = {
 			text,
 			img
 		}
 		console.log(commentData)
-		postComment(id,commentData);
+		postComment({id,commentData});
 	};
 
 	const handleLikePost = (id) => {
@@ -125,16 +121,16 @@ const Post = ({ post,feedtype }) => {
 							</div>
 							{/* We're using Modal Component from DaisyUI */}
 							<dialog id={`comments_modal${post._id}`} className='modal border-none outline-none'>
-								<div className='modal-box rounded border border-gray-600'>
+								<div className='modal-box h-11/12 w-11/12 max-w-5xl rounded border border-gray-600 flex flex-col'>
 									<h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
-									<div className='flex flex-col gap-3 max-h-60 overflow-auto'>
+									<div className='flex-1 overflow-y-auto flex flex-col gap-3 px-4 py-2'>
 										{post.comments.length === 0 && (
 											<p className='text-sm text-slate-500'>
 												No comments yet 🤔 Be the first one 😉
 											</p>
 										)}
 										{post.comments.map((comment) => (
-											<div key={comment._id} className='flex gap-2 items-start'>
+											<div key={comment._id} className='flex gap-2 items-start flex-1'>
 												<div className='avatar'>
 													<div className='w-8 rounded-full'>
 														<img
@@ -154,7 +150,7 @@ const Post = ({ post,feedtype }) => {
 														{comment.img && (
 															<img
 																src={comment.img}
-																className='h-80 object-contain rounded-lg border border-gray-700'
+																className='w-60 h-60 object-cover rounded-lg border border-gray-700'
 																alt=''
 															/>
 														)}
@@ -166,13 +162,13 @@ const Post = ({ post,feedtype }) => {
 										<div className='flex p-4 items-start gap-4 border-b border-gray-700'>
 											<div className='avatar'>
 												<div className='w-8 rounded-full'>
-													<img src={data.profileImg || "/avatar-placeholder.png"} />
+													<img src={authUser.profileImage || "/avatar-placeholder.png"} />
 												</div>
 											</div>
 											<form className='flex flex-col gap-2 w-full' onSubmit={(e) => handlePostComment(e,post._id)}>
 												<textarea
 													className='textarea w-full p-0 text-lg resize-none border-none focus:outline-none  border-gray-800'
-													placeholder='What is happening?!'
+													placeholder='Post your reply'
 													value={text}
 													onChange={(e) => setText(e.target.value)}
 												/>
@@ -199,10 +195,9 @@ const Post = ({ post,feedtype }) => {
 													</div>
 													<input type='file' accept="image/*" hidden ref={imgRef} onChange={handleImgChange} />
 													<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
-														{isPending ? "Posting..." : "Post"}
+														{isPending ? <LoadingSpinner /> : "Post"}
 													</button>
 												</div>
-												{isError && <div className='text-red-500'>Something went wrong</div>}
 											</form>
 										</div>
 								</div>

@@ -22,7 +22,7 @@ export default function useDeletePostMutation(feedtype) {
     },
     onError: (error) => {
       console.error(`Error occured in mutation: ${error.message}`);
-      toast.error(error.response?.data?.message || 'Failed to sign in');
+      toast.error(error.response?.data?.message || 'Failed to delete post');
     }
   })
 }

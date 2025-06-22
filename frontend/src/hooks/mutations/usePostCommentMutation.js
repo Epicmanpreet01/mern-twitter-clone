@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 export default function usePostCommentMutation(feedtype,) {
   const QueryClient = useQueryClient();
   return useMutation({
-    mutationFn: async(id,commentData) => {
+    mutationFn: async({id,commentData}) => {
       try {
         console.log(commentData);
         const res = await axios.post('/api/post/comment/'+id, commentData);
@@ -21,8 +21,8 @@ export default function usePostCommentMutation(feedtype,) {
       QueryClient.invalidateQueries({queryKey: ['posts', feedtype]});
     },
     onError: (error) => {
-      console.error(error.message);
-      toast.error(error.message);
+      console.error(`Error occured in mutation: ${error.message}`);
+      toast.error(error.response?.data?.message || 'Failed to post comment');
     }
   })
 }

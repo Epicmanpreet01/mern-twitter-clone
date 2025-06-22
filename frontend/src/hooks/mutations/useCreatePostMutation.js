@@ -20,7 +20,8 @@ export default function useCreatePostMutation(feedtype) {
       queryClient.invalidateQueries({queryKey: ['posts',feedtype]});
     },
     onError: (error) => {
-      toast.error(error.message);
+      console.error(`Error occured in mutation: ${error.message}`);
+      toast.error(error.response?.data?.message || 'Failed to create post');
     }
   })
 }

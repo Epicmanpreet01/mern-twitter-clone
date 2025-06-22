@@ -10,7 +10,7 @@ import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 const CreatePost = ({feedtype}) => {
 
 	const {data:authUser} = useAuthUser();
-	const {mutate:createPostMutation, isPending, isError, error} = useCreatePostMutation(feedtype);
+	const {mutate:createPostMutation, isPending} = useCreatePostMutation(feedtype);
 
 	const [text, setText] = useState("");
 	const [img, setImg] = useState(null);
@@ -77,7 +77,6 @@ const CreatePost = ({feedtype}) => {
 						{isPending ? <LoadingSpinner /> : "Post"}
 					</button>
 				</div>
-				{isError && <div className='text-red-500'>{error.message}</div>}
 			</form>
 		</div>
 	);
