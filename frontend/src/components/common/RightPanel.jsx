@@ -19,7 +19,6 @@ const RightPanel = () => {
     });
   };
 
-	console.log(suggestions)
 	if (suggestions?.length === 0) return <div className="lg:w-64 w-0"></div>;
 
 	return (

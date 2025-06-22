@@ -13,22 +13,23 @@ import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import useUserProfile from "../../hooks/queries/useUserProfile";
 import useAuthUser from "../../hooks/queries/useAuthUser";
+import useFollowMutation from "../../hooks/mutations/useFollowMutation.js";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const ProfilePage = () => {
 
 	const {userName} = useParams()
 	
 	const {data:authUser} = useAuthUser();
-
 	const {data:user, isLoading} = useUserProfile(userName);
+	const {mutate:followMutation, isPending} = useFollowMutation();
+
 	const [coverImg, setCoverImg] = useState(null);
 	const [profileImg, setProfileImg] = useState(null);
 	const [feedType, setFeedType] = useState("posts");
 
 	const coverImgRef = useRef(null);
 	const profileImgRef = useRef(null);
-
-	const isMyProfile = !isLoading && user._id === authUser._id;
 
 	const handleImgChange = (e, state) => {
 		const file = e.target.files[0];
@@ -42,10 +43,16 @@ const ProfilePage = () => {
 		}
 	};
 
+	const handleFollow = (id) => {
+		followMutation(id);
+	}
+
+	const isMyProfile = !isLoading && user._id === authUser._id;
 	const formatedJoinDate = new Date(user?.createdAt).toLocaleDateString('en-US', {
 		month: 'long',
 		year: 'numeric'
 	})
+	const following = authUser?.following.includes(user._id);
 
 	return (
 		<>
@@ -113,9 +120,11 @@ const ProfilePage = () => {
 								{!isMyProfile && (
 									<button
 										className='btn btn-outline rounded-full btn-sm'
-										onClick={() => alert("Followed successfully")}
+										onClick={() => handleFollow(user?._id)}
 									>
-										Follow
+										{isPending && <LoadingSpinner />}
+										{!isPending && following && 'Unfollow'}
+										{!isPending && !following && 'Follow'}
 									</button>
 								)}
 								{(coverImg || profileImg) && (

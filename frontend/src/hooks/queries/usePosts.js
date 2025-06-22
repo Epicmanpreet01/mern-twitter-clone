@@ -19,7 +19,7 @@ export default function usePosts(feedtype, userName) {
         const res = await axios(POSTS_ENDPOINT);
         return res.data.data;
       } catch (error) {
-        console.log(`Error occurred while fetching posts: ${error.message}`);
+        console.error(`Error occurred while fetching posts: ${error.message}`);
         throw error;
       }
     },
