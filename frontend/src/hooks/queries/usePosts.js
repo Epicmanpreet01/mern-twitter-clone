@@ -24,5 +24,6 @@ export default function usePosts(feedtype, userName) {
       }
     },
     retry: false,
+    keepPreviousData: false
   });
 }
