@@ -18,7 +18,7 @@ const EditProfileModal = ({authUser}) => {
 	const {mutate:updateProfileMutation, isPending} = useUpdateProfileMutation(modalRef);
 
 	const handleUpdate = () => {
-		console.log('Updating with data:', formData); // ← Add this
+		console.log('Updating with data:', formData);
 		updateProfileMutation(formData);
 		setFormData(prevFormData => ({
 			...prevFormData, 

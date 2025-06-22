@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/all', protectedRoutes, getPosts);
 router.get('/liked/:userName', protectedRoutes, getLikedPosts);
 router.get('/following', protectedRoutes, getFollowingPosts);
-router.get('/user/:userName', protectedRoutes, getUserPosts); // Assuming this is for getting posts by a specific user
+router.get('/user/:userName', protectedRoutes, getUserPosts);
 router.post('/create', protectedRoutes, createPost);
 router.post('/like/:id', protectedRoutes, likePost);
 router.post('/comment/:id', protectedRoutes, commentOnPost);

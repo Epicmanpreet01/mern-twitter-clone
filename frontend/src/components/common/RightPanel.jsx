@@ -15,7 +15,7 @@ const RightPanel = () => {
     e.preventDefault();
     setLoadingId(id);
     followUnfollowMutation(id, {
-      onSettled: () => setLoadingId(null), // Always reset after success or error
+      onSettled: () => setLoadingId(null), 
     });
   };
 

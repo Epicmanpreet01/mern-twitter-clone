@@ -8,7 +8,6 @@ export const protectedRoutes = async function (req,res,next) {
     if(!token) {
       req.user = null
       return res.status(401).json({error: 'Unauthorized access, please login to continue'});
-      // return res.redirect('/login');
     }
     const isTokenValid = jwt.verify(token, process.env.JWT_SECRET);
     if(isTokenValid) {

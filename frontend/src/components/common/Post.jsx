@@ -124,7 +124,6 @@ const Post = ({ post,feedtype, userName }) => {
 									{post.comments.length}
 								</span>
 							</div>
-							{/* We're using Modal Component from DaisyUI */}
 							<dialog id={`comments_modal${post._id}`} className='modal border-none outline-none'>
 								<div className='modal-box h-11/12 w-11/12 max-w-5xl rounded border border-gray-600 flex flex-col'>
 									<h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
