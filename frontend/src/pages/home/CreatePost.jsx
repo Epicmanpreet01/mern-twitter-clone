@@ -3,22 +3,27 @@ import { BsEmojiSmileFill } from "react-icons/bs";
 import { useRef, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 
-const CreatePost = () => {
+import useAuthUser from "../../hooks/queries/useAuthUser.js";
+import useCreatePostMutation from "../../hooks/mutations/useCreatePostMutation.js";
+import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+
+const CreatePost = ({feedtype}) => {
+
+	const {data:authUser} = useAuthUser();
+	const {mutate:createPostMutation, isPending, isError, error} = useCreatePostMutation(feedtype);
+
 	const [text, setText] = useState("");
 	const [img, setImg] = useState(null);
 
 	const imgRef = useRef(null);
 
-	const isPending = false;
-	const isError = false;
 
-	const data = {
-		profileImg: "/avatars/boy1.png",
-	};
 
 	const handleSubmit = (e) => {
+		setText('');
+		setImg(null);
 		e.preventDefault();
-		alert("Post created successfully");
+		createPostMutation({text,img});
 	};
 
 	const handleImgChange = (e) => {
@@ -36,7 +41,7 @@ const CreatePost = () => {
 		<div className='flex p-4 items-start gap-4 border-b border-gray-700'>
 			<div className='avatar'>
 				<div className='w-8 rounded-full'>
-					<img src={data.profileImg || "/avatar-placeholder.png"} />
+					<img src={authUser.profileImage || "/avatar-placeholder.png"} />
 				</div>
 			</div>
 			<form className='flex flex-col gap-2 w-full' onSubmit={handleSubmit}>
@@ -69,10 +74,10 @@ const CreatePost = () => {
 					</div>
 					<input type='file' accept="image/*" hidden ref={imgRef} onChange={handleImgChange} />
 					<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
-						{isPending ? "Posting..." : "Post"}
+						{isPending ? <LoadingSpinner /> : "Post"}
 					</button>
 				</div>
-				{isError && <div className='text-red-500'>Something went wrong</div>}
+				{isError && <div className='text-red-500'>{error.message}</div>}
 			</form>
 		</div>
 	);
