@@ -11,7 +11,7 @@ export default function useLikePostMutation(feedtype) {
         const res = await axios.post('/api/post/like/'+id)
         const data = res.data;
         if(data.error) throw new Error(data.error);
-        return data;
+        return data.data;
       } catch (error) {
         console.error(`Error occured while liking the post with id: ${id} with error code: ${error.message}`)
         throw error

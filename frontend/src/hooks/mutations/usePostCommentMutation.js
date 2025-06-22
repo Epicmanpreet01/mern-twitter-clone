@@ -12,6 +12,7 @@ export default function usePostCommentMutation(feedtype,) {
         const res = await axios.post('/api/post/comment/'+id, commentData);
         const data = res.data;
         if(data.error) throw new Error(data.error);
+        return data.data;
       } catch (error) {
         console.error(`Error occured while posting a comment on the post with id: ${id} with error code: ${error.message}`)
         throw error

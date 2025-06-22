@@ -181,8 +181,8 @@ export const getSuggestedUsers = async function(req,res) {
 
     suggestedUsers.forEach(user => user.password = null); // Remove password from suggested users
 
-    if(suggestedUsers.length === 0) {
-      return res.status(404).json({message: 'No suggested users found'});
+    if (suggestedUsers.length === 0) {
+      return res.status(200).json({ message: 'No users found', data: [] });
     }
 
     res.status(200).json({message: 'Suggested users fetched successfully', data: suggestedUsers});

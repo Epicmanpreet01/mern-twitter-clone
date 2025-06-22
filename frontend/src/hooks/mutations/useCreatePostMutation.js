@@ -10,6 +10,7 @@ export default function useCreatePostMutation(feedtype) {
         const res = await axios.post('/api/post/create', postData);
         const data = res.data;
         if(data.error) throw new Error(data.error);
+        return data.data;
       } catch (error) {
         console.error(`Error occured while creating post: ${error.message}`)
         throw error
