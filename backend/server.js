@@ -2,6 +2,7 @@ import express from 'express';
 import { config } from 'dotenv';
 import cookieParser from 'cookie-parser';
 import {v2 as cloudinary} from 'cloudinary';
+import path from 'path';
 
 import oauthRoutes from './routes/oauth.route.js';
 import userRoutes from './routes/user.route.js';
@@ -22,6 +23,8 @@ const PORT = process.env.PORT;
 
 const app = express();
 
+const __dirname = path.resolve();
+
 //Input parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -33,9 +36,10 @@ app.use('/api/user', userRoutes);
 app.use('/api/post', tweetRoutes);
 app.use('/api/notification', notificationRoutes);
 
-app.get('/', (req,res) => {
-  res.status(200).send('Hello to root')
-})
+
+if (process.env.NODE_ENV == 'production') {
+  app.use(express.static(path.join(__dirname, '/frontend/dist')));
+}
 
 app.listen(PORT, async () => {
   const {success,message} = await db.connectDb();
