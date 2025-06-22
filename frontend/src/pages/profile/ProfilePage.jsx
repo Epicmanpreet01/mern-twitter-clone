@@ -25,7 +25,7 @@ const ProfilePage = () => {
 	const {data:authUser} = useAuthUser();
 	const {data:user, isLoading} = useUserProfile(userName);
 	const {mutate:followMutation, isPending} = useFollowMutation();
-	const {mutate:updateUser, isPending:isUpdating} = useUpdateProfileMutation(feedType);
+	const {mutateAsync:updateUser, isPending:isUpdating} = useUpdateProfileMutation('',authUser?.userName);
 
 
 	const [bannerImage, setbannerImage] = useState(null);
@@ -51,11 +51,13 @@ const ProfilePage = () => {
 		followMutation(id);
 	}
 
-	const handleUpdate = () => {
-		updateUser({
+	const handleUpdate = async () => {
+		await updateUser({
 			bannerImage: bannerImage,
 			profileImage: profileImage
 		});
+		setbannerImage(null);
+		setprofileImage(null);
 	}
 
 	const isMyProfile = !isLoading && user._id === authUser._id;
@@ -86,7 +88,7 @@ const ProfilePage = () => {
 							{/* COVER IMG */}
 							<div className='relative group/cover'>
 								<img
-									src={bannerImage || user?.coverImage || "/cover.png"}
+									src={bannerImage || user?.bannerImage || "/cover.png"}
 									className='h-52 w-full object-cover'
 									alt='cover image'
 								/>
@@ -161,12 +163,12 @@ const ProfilePage = () => {
 											<>
 												<FaLink className='w-3 h-3 text-slate-500' />
 												<a
-													href='https://youtube.com/@asaprogrammer_'
+													href={`${user?.link}`}
 													target='_blank'
 													rel='noreferrer'
 													className='text-sm text-blue-500 hover:underline'
 												>
-													youtube.com/@asaprogrammer_
+													{user?.link}
 												</a>
 											</>
 										</div>

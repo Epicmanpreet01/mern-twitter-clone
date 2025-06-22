@@ -81,7 +81,7 @@ export const updateProfile = async function(req,res) {
     }
 
     //Password validation
-    if((!currentPassword && newPassword) || (currentPassword && !newPassword)) {
+    if((currentPassword === '' && newPassword) || (currentPassword && newPassword === '')) {
       return res.status(400).json({error: 'Both current and new password are required'});
     }
 
@@ -97,15 +97,15 @@ export const updateProfile = async function(req,res) {
         return res.status(400).json({error: 'Invalid password format'});
       }
 
-      const isPasswordCorrect = bcrypt.compare(currentPassword, user.password);
-
+      const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
       if(!isPasswordCorrect) {
         return res.status(400).json({error: 'Current password is incorrect'});
       }
 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(newPassword, salt);
-      newPassword = hashedPassword;
+      newPassword = hashedPassword; // Update the password
+      await user.save();
     }
 
     //Profile Image

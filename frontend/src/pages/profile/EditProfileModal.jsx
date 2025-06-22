@@ -20,6 +20,11 @@ const EditProfileModal = ({authUser}) => {
 	const handleUpdate = () => {
 		console.log('Updating with data:', formData); // ← Add this
 		updateProfileMutation(formData);
+		setFormData(prevFormData => ({
+			...prevFormData, 
+				newPassword: '',
+				currentPassword: ''
+		}))
 	}
 
 	const handleInputChange = (e) => {
