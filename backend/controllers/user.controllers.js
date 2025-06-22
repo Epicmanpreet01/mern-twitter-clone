@@ -69,7 +69,7 @@ export const followUnfollowUser = async function(req,res) {
 
 export const updateProfile = async function(req,res) {
   let { name, userName, email, currentPassword, newPassword, bio, link } = req.body;
-  const { profileImage, bannerImage } = req.body;
+  let { profileImage, bannerImage } = req.body;
 
   const userId = req.user._id;
   
@@ -91,7 +91,7 @@ export const updateProfile = async function(req,res) {
         return res.status(400).json({error: 'Current password and new password cannot be the same'})
       }
 
-      const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+      const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
       const validPassword = regex.test(newPassword);
       if(!validPassword) {
         return res.status(400).json({error: 'Invalid password format'});
@@ -105,8 +105,7 @@ export const updateProfile = async function(req,res) {
 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(newPassword, salt);
-      newPassword = hashedPassword; // Update the password
-      await user.save();
+      newPassword = hashedPassword;
     }
 
     //Profile Image
@@ -130,16 +129,15 @@ export const updateProfile = async function(req,res) {
 
     if(userName) {
       const doesExist = await User.findOne({ userName });
-      if(doesExist) return res.status(400).json({error: 'Username already exists'});
+      console.log(doesExist && doesExist._id !== userId);
+      if(doesExist && doesExist._id.toString() !== userId.toString()) return res.status(400).json({error: 'Username already exists'});
     }
 
     if(email) {
-      const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/
+      const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       const valid = regex.test(email);
       if(!valid) return res.status(400).json({error: 'Invalid email format'})
     }
-
-    console.log('hello');
 
     user.name = name || user.name;
     user.userName = userName || user.userName;

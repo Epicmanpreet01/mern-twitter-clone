@@ -119,6 +119,8 @@ export const getCurrUser = function (req,res) {
       following: user.following,
       profileImage: user.profileImage,
       bannerImage: user.bannerImage,
+      link: user.link,
+      bio: user.bio,
     })
 
   } catch (error) {
