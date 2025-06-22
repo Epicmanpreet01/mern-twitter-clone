@@ -40,7 +40,6 @@ const CreatePost = ({feedtype}) => {
 
 	const handleEmojiClick = (emojiData) => {
 		setText((prevText) => prevText+ emojiData.emoji);
-		setEmojiKeyBoard(!emojiKeyBoard);
 	}
 
 	return (
