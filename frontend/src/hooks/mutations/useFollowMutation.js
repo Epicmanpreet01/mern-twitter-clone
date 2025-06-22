@@ -19,7 +19,10 @@ export default function useLikePostMutation() {
     },
     onSuccess: () => {
       toast.success('Follow/Unfollow action successful');
-      queryClient.invalidateQueries({ queryKey: ['suggestions'] });
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['suggestions'] }),
+        queryClient.invalidateQueries({ queryKey: ['authUser'] }),
+      ])
     },
     onError: (error) => {
       console.error(`Error occured in mutation: ${error.message}`);

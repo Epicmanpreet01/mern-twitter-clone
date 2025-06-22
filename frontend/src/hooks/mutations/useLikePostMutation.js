@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-export default function useLikePostMutation(feedtype) {
+export default function useLikePostMutation(feedtype, post) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -17,8 +17,15 @@ export default function useLikePostMutation(feedtype) {
         throw error
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['posts', feedtype]});
+    onSuccess: (updatedLikes) => {
+      queryClient.setQueryData(['posts', feedtype], (oldPosts) => {
+        return oldPosts.map((p) => {
+          if (p._id === post._id) {
+            return { ...p, likes: updatedLikes };
+          }
+          return p;
+        });
+      });
     },
     onError: (error) => {
       console.error(`Error occured in mutation: ${error.message}`);

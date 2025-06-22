@@ -22,7 +22,7 @@ const Post = ({ post,feedtype }) => {
 	
 	const {data:authUser} = useAuthUser();
 	const {mutate:deletePostMutuation, isPending:deletePending} = useDeletePostMutation(feedtype);
-	const {mutate:likePostMutation} = useLikePostMutation(feedtype);
+	const {mutate:likePostMutation, isPending:isLiking} = useLikePostMutation(feedtype,post);
 	const {mutate:postComment, isPending} = usePostCommentMutation(feedtype);
 
 	const postOwner = post.poster;
@@ -222,10 +222,11 @@ const Post = ({ post,feedtype }) => {
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
 							</div>
 							<div className='flex gap-1 items-center group cursor-pointer' onClick={() => handleLikePost(post._id)}>
-								{!isLiked && (
+								{isLiking && <LoadingSpinner size="sm" />}
+								{!isLiked && !isLiking && (
 									<FaRegHeart className='w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500' />
 								)}
-								{isLiked && <FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500 ' />}
+								{isLiked && !isLiking && <FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500 ' />}
 
 								<span
 									className={`text-sm text-slate-500 group-hover:text-pink-500 ${

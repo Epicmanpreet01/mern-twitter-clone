@@ -159,7 +159,9 @@ export const likePost = async function(req,res) {
     if(isLiked) {
       await Post.findByIdAndUpdate(postId, {$pull : {likes: userId}});
       await User.findByIdAndUpdate(userId, {$pull: {likedPosts: postId}});
-      return res.status(200).json({message: 'Post unliked', data: postId});
+      const updatedLikes = post.likes.filter(like => like.toString() !== userId.toString());
+
+      return res.status(200).json({message: 'Post unliked', data: updatedLikes});
     } else {
       await Post.findByIdAndUpdate(postId, {$push: {likes: userId} });
       await User.findByIdAndUpdate(userId, {$push: {likedPosts: postId}});
@@ -171,7 +173,8 @@ export const likePost = async function(req,res) {
 
       await notification.save();
 
-      return res.status(200).json({message: 'Post liked', data: post});
+      const updatedLikes = [...post.likes, userId];
+      return res.status(200).json({message: 'Post liked', data: updatedLikes});
     }
   } catch (error) {
     console.error(`Error occured in liking the post: PostId: ${postId}, error: ${error.message}`)
