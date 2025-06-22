@@ -5,13 +5,14 @@ import { IoNotifications } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
+import useAuthUser from "../../hooks/queries/useAuthUser";
 
 const Sidebar = () => {
 	const queryClient = useQueryClient();
-	const {data:authUser} = useQuery({queryKey:['authUser']});
+	const {data:authUser} = useAuthUser();
 	const { mutate: signOutMutation } = useMutation({
 		mutationFn: async() => {
 			try {

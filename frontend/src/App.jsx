@@ -7,28 +7,11 @@ import RightPanel from './components/common/RightPanel.jsx'
 import NotificationPage from './pages/notification/NotificationPage.jsx'
 import ProfilePage from './pages/profile/ProfilePage.jsx'
 import { Toaster } from 'react-hot-toast'
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
 import LoadingSpinner from './components/common/LoadingSpinner.jsx'
+import useAuthUser from './hooks/queries/useAuthUser.js'
 
 function App() {
-  const { data:authUser, isLoading  } = useQuery({
-    queryKey: ['authUser'],
-    queryFn: async() => {
-      try {
-        const res = await axios('/api/oauth/me');
-        const data = res.data;
-        if(res.status !==200) throw new Error(data.message);
-        return data;
-      } catch (error) {
-        console.error(`Error occured while fetching user data: ${error.message}`);
-        return null
-      }
-    },
-    retry: false,
-  })
-
-  console.log(authUser);
+  const { data:authUser, isLoading  } = useAuthUser()
 
   if(isLoading) {
     return <div className='h-screen flex justify-center items-center'><LoadingSpinner className="size-lg" /></div>

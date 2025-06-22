@@ -1,24 +1,36 @@
+import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
+
+import useAuthUser from "../../hooks/queries/useAuthUser";
+import useDeletePostMutation from "../../hooks/mutations/useDeletePostMutation";
+
+import LoadingSpinner from './LoadingSpinner'
+
 import { FaRegComment } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
 import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
-import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
 import { CiImageOn } from "react-icons/ci";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoCloseSharp } from "react-icons/io5";
+import useLikePostMutation from "../../hooks/mutations/useLikePostMutation";
+import usePostCommentMutation from "../../hooks/mutations/usePostCommentMutation";
 
-const Post = ({ post }) => {
+const Post = ({ post,feedtype }) => {
+	
+	const {data:authUser} = useAuthUser();
+	const {mutate:deletePostMutuation, isPending:deletePending} = useDeletePostMutation(feedtype);
+	const {mutate:likePostMutation} = useLikePostMutation(feedtype);
+	const {mutate:postComment} = usePostCommentMutation(feedtype);
+
 	const postOwner = post.poster;
-	const isLiked = false;
+	const isLiked = post.likes.includes(authUser._id);
 
 	const [text, setText] = useState("");
 	const [img, setImg] = useState(null);
-
 	const imgRef = useRef(null);
 
-	const isPending = false;
 	const isError = false;
 
 	const data = {
@@ -37,17 +49,27 @@ const Post = ({ post }) => {
 		}
 	};
 
-	const isMyPost = true;
-
+	const isMyPost = postOwner._id === authUser._id;
+	const isPending = false
 	const formattedDate = "1h";
 
-	const handleDeletePost = () => {};
-
-	const handlePostComment = (e) => {
-		e.preventDefault();
+	const handleDeletePost = (id) => {
+		deletePostMutuation(id)
 	};
 
-	const handleLikePost = () => {};
+	const handlePostComment = (e,id) => {
+		e.preventDefault();
+		const commentData = {
+			text,
+			img
+		}
+		console.log(commentData)
+		postComment(id,commentData);
+	};
+
+	const handleLikePost = (id) => {
+		likePostMutation(id)
+	};
 
 	return (
 		<>
@@ -69,7 +91,14 @@ const Post = ({ post }) => {
 						</span>
 						{isMyPost && (
 							<span className='flex justify-end flex-1'>
-								<FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
+								{deletePending ? (
+									<LoadingSpinner />
+								) : (
+									<FaTrash
+										className="cursor-pointer hover:text-red-500"
+										onClick={() => handleDeletePost(post._id)}
+									/>
+								)}
 							</span>
 						)}
 					</div>
@@ -140,7 +169,7 @@ const Post = ({ post }) => {
 													<img src={data.profileImg || "/avatar-placeholder.png"} />
 												</div>
 											</div>
-											<form className='flex flex-col gap-2 w-full' onSubmit={handlePostComment}>
+											<form className='flex flex-col gap-2 w-full' onSubmit={(e) => handlePostComment(e,post._id)}>
 												<textarea
 													className='textarea w-full p-0 text-lg resize-none border-none focus:outline-none  border-gray-800'
 													placeholder='What is happening?!'
@@ -185,7 +214,7 @@ const Post = ({ post }) => {
 								<BiRepost className='w-6 h-6  text-slate-500 group-hover:text-green-500' />
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
 							</div>
-							<div className='flex gap-1 items-center group cursor-pointer' onClick={handleLikePost}>
+							<div className='flex gap-1 items-center group cursor-pointer' onClick={() => handleLikePost(post._id)}>
 								{!isLiked && (
 									<FaRegHeart className='w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500' />
 								)}
