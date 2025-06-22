@@ -7,17 +7,18 @@ import useAuthUser from "../../hooks/queries/useAuthUser.js";
 import useCreatePostMutation from "../../hooks/mutations/useCreatePostMutation.js";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 
+import EmojiPicker from 'emoji-picker-react';
+
 const CreatePost = ({feedtype}) => {
 
 	const {data:authUser} = useAuthUser();
 	const {mutate:createPostMutation, isPending} = useCreatePostMutation(feedtype);
 
+	const [emojiKeyBoard,setEmojiKeyBoard] = useState(false);
 	const [text, setText] = useState("");
 	const [img, setImg] = useState(null);
 
 	const imgRef = useRef(null);
-
-
 
 	const handleSubmit = (e) => {
 		setText('');
@@ -36,6 +37,11 @@ const CreatePost = ({feedtype}) => {
 			reader.readAsDataURL(file);
 		}
 	};
+
+	const handleEmojiClick = (emojiData) => {
+		setText((prevText) => prevText+ emojiData.emoji);
+		setEmojiKeyBoard(!emojiKeyBoard);
+	}
 
 	return (
 		<div className='flex p-4 items-start gap-4 border-b border-gray-700'>
@@ -64,13 +70,19 @@ const CreatePost = ({feedtype}) => {
 					</div>
 				)}
 
-				<div className='flex justify-between border-t py-2 border-t-gray-700'>
+				<div className='flex justify-between border-t py-2 border-t-gray-700 relative'>
 					<div className='flex gap-1 items-center'>
 						<CiImageOn
 							className='fill-primary w-6 h-6 cursor-pointer'
 							onClick={() => imgRef.current.click()}
 						/>
-						<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' />
+						<div className="relative">
+							<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' onClick={() => setEmojiKeyBoard(!emojiKeyBoard)}/>
+							<EmojiPicker open={emojiKeyBoard} theme="dark" onEmojiClick={handleEmojiClick} style={{
+								position:'absolute',
+								top: 30,
+							}} />
+						</div>
 					</div>
 					<input type='file' accept="image/*" hidden ref={imgRef} onChange={handleImgChange} />
 					<button className='btn btn-primary rounded-full btn-sm text-white px-4'>

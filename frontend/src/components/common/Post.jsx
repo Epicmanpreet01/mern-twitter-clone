@@ -16,6 +16,7 @@ import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoCloseSharp } from "react-icons/io5";
 import useLikePostMutation from "../../hooks/mutations/useLikePostMutation";
 import usePostCommentMutation from "../../hooks/mutations/usePostCommentMutation";
+import EmojiPicker from "emoji-picker-react";
 
 const Post = ({ post,feedtype }) => {
 	
@@ -29,9 +30,9 @@ const Post = ({ post,feedtype }) => {
 
 	const [text, setText] = useState("");
 	const [img, setImg] = useState(null);
+	const [emojiKeyBoard,setEmojiKeyBoard] = useState(false);
+
 	const imgRef = useRef(null);
-
-
 
 	const handleImgChange = (e) => {
 		const file = e.target.files[0];
@@ -66,6 +67,11 @@ const Post = ({ post,feedtype }) => {
 	const handleLikePost = (id) => {
 		likePostMutation(id)
 	};
+
+	const handleEmojiClick = (emojiData) => {
+		setText((prevText) => prevText+ emojiData.emoji);
+		setEmojiKeyBoard(!emojiKeyBoard);
+	}
 
 	return (
 		<>
@@ -191,7 +197,13 @@ const Post = ({ post,feedtype }) => {
 															className='fill-primary w-6 h-6 cursor-pointer'
 															onClick={() => imgRef.current.click()}
 														/>
-														<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' />
+														<div className="relative">
+															<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' onClick={() => setEmojiKeyBoard(!emojiKeyBoard)}/>
+															<EmojiPicker open={emojiKeyBoard} theme="dark" onEmojiClick={handleEmojiClick} style={{
+																position:'absolute',
+																bottom: 50,
+															}} />
+														</div>
 													</div>
 													<input type='file' accept="image/*" hidden ref={imgRef} onChange={handleImgChange} />
 													<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
