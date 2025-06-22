@@ -16,10 +16,9 @@ import useAuthUser from "../../hooks/queries/useAuthUser";
 
 const ProfilePage = () => {
 
-	let {userName} = useParams()
-	const {data:authUser} = useAuthUser();
+	const {userName} = useParams()
 	
-	userName = userName || authUser.userName;
+	const {data:authUser} = useAuthUser();
 
 	const {data:user, isLoading} = useUserProfile(userName);
 	const [coverImg, setCoverImg] = useState(null);
@@ -29,9 +28,7 @@ const ProfilePage = () => {
 	const coverImgRef = useRef(null);
 	const profileImgRef = useRef(null);
 
-	const isMyProfile = false;
-
-	console.log(user);
+	const isMyProfile = !isLoading && user._id === authUser._id;
 
 	const handleImgChange = (e, state) => {
 		const file = e.target.files[0];
@@ -193,7 +190,7 @@ const ProfilePage = () => {
 						</>
 					)}
 
-					<Posts />
+					<Posts feedtype={feedType} userName={user?.userName} />
 				</div>
 			</div>
 		</>

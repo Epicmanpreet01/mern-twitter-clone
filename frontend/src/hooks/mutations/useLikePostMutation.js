@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-export default function useLikePostMutation(feedtype, post) {
+export default function useLikePostMutation(feedtype, post, userName) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -18,7 +18,7 @@ export default function useLikePostMutation(feedtype, post) {
       }
     },
     onSuccess: (updatedLikes) => {
-      queryClient.setQueryData(['posts', feedtype], (oldPosts) => {
+      queryClient.setQueryData(['posts', feedtype, userName], (oldPosts) => {
         return oldPosts.map((p) => {
           if (p._id === post._id) {
             return { ...p, likes: updatedLikes };

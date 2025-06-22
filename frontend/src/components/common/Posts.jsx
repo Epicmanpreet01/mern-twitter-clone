@@ -2,9 +2,9 @@ import Post from "./Post";
 import PostSkeleton from "../skeletons/PostSkeleton";
 import usePosts from "../../hooks/queries/usePosts";
 
-const Posts = ({ feedtype }) => {
+const Posts = ({ feedtype, userName }) => {
 
-	const { data: posts, isLoading,isFetching} = usePosts(feedtype)
+	const { data: posts, isLoading,isFetching} = usePosts(feedtype,userName)
 
 	return (
 		<>
@@ -19,7 +19,7 @@ const Posts = ({ feedtype }) => {
 			{!isFetching && !isLoading && posts && (
 				<div>
 					{posts.map((post) => (
-						<Post key={post._id} feedtype={feedtype} post={post} />
+						<Post key={post._id} feedtype={feedtype} post={post} userName={userName} />
 					))}
 				</div>
 			)}

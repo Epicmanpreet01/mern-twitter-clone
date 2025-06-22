@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export default function useCreatePostMutation(feedtype) {
+export default function useCreatePostMutation(feedtype, userName) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async(postData) => {
@@ -18,7 +18,7 @@ export default function useCreatePostMutation(feedtype) {
     },
     onSuccess: () =>{
       toast.success('Post created successfully');
-      queryClient.invalidateQueries({queryKey: ['posts',feedtype]});
+      queryClient.invalidateQueries({queryKey: ['posts',feedtype, userName]});
     },
     onError: (error) => {
       console.error(`Error occured in mutation: ${error.message}`);

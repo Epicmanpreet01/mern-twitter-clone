@@ -29,7 +29,8 @@ export const getPosts = async function(req,res) {
 }
 
 export const getLikedPosts = async function(req,res) {
-  const user = req.user;
+  const { userName } = req.params;
+  const user = await User.findOne({ userName });
 
   try {
     const likedPosts = user.likedPosts;

@@ -3,7 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 
-export default function usePostCommentMutation(feedtype,post) {
+export default function usePostCommentMutation(feedtype,post, userName) {
   
   const QueryClient = useQueryClient();
   return useMutation({
@@ -20,7 +20,7 @@ export default function usePostCommentMutation(feedtype,post) {
       }
     },
     onSuccess: (commentData) => {
-      QueryClient.setQueryData(['posts', feedtype], (oldposts) => {
+      QueryClient.setQueryData(['posts', feedtype, userName], (oldposts) => {
         if (!oldposts) return oldposts;
 
         return oldposts.map(p => {

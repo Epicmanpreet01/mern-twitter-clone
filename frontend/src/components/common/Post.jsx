@@ -18,12 +18,12 @@ import useLikePostMutation from "../../hooks/mutations/useLikePostMutation";
 import usePostCommentMutation from "../../hooks/mutations/usePostCommentMutation";
 import EmojiPicker from "emoji-picker-react";
 
-const Post = ({ post,feedtype }) => {
+const Post = ({ post,feedtype, userName }) => {
 	
 	const {data:authUser} = useAuthUser();
-	const {mutate:deletePostMutuation, isPending:deletePending} = useDeletePostMutation(feedtype);
-	const {mutate:likePostMutation, isPending:isLiking} = useLikePostMutation(feedtype,post);
-	const {mutate:postComment, isPending} = usePostCommentMutation(feedtype, post);
+	const {mutate:deletePostMutuation, isPending:deletePending} = useDeletePostMutation(feedtype,userName);
+	const {mutate:likePostMutation, isPending:isLiking} = useLikePostMutation(feedtype,post, userName);
+	const {mutate:postComment, isPending} = usePostCommentMutation(feedtype, post, userName);
 
 	const postOwner = post.poster;
 	const isLiked = post.likes.includes(authUser._id);
@@ -136,7 +136,7 @@ const Post = ({ post,feedtype }) => {
 											</p>
 										)}
 										{post.comments.map((comment) => (
-											<div key={comment._id} className='flex gap-2 items-start flex-1'>
+											<div key={comment._id} className='flex gap-2 items-start'>
 												<div className='avatar'>
 													<div className='w-8 rounded-full'>
 														<img
