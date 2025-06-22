@@ -4,33 +4,31 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
+import { MdDelete } from "react-icons/md";
+import useNotifications from "../../hooks/queries/useNotifications";
+import { useDeleteAllMutation, useDeleteOneMutation } from "../../hooks/mutations/useDeleteNotiMutation";
+import { useState } from "react";
 
 const NotificationPage = () => {
-	const isLoading = false;
-	const notifications = [
-		{
-			_id: "1",
-			from: {
-				_id: "1",
-				username: "johndoe",
-				profileImg: "/avatars/boy2.png",
-			},
-			type: "follow",
-		},
-		{
-			_id: "2",
-			from: {
-				_id: "2",
-				username: "janedoe",
-				profileImg: "/avatars/girl1.png",
-			},
-			type: "like",
-		},
-	];
+
+	const {data:notifications, isLoading} = useNotifications();
+	const {mutate:deleteAllMutation, isPending:isDeleteAllPending} = useDeleteAllMutation();
+	const {mutate:deleteOneMutation, isPending:isDeleteOnePending} = useDeleteOneMutation();
+
+	const [loadingId,setLoadingId] = useState(false);
 
 	const deleteNotifications = () => {
-		alert("All notifications deleted");
+		deleteAllMutation();
 	};
+
+	const handleDeleteOne = (id) => {
+		setLoadingId(id);
+		deleteOneMutation(id, {
+			onSettled: () => {
+				setLoadingId(false);
+			}
+		});
+	}
 
 	return (
 		<>
@@ -46,7 +44,12 @@ const NotificationPage = () => {
 							className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52'
 						>
 							<li>
-								<a onClick={deleteNotifications}>Delete all notifications</a>
+								<a
+									onClick={!isDeleteAllPending ? deleteNotifications : undefined}
+									className={isDeleteAllPending ? "pointer-events-none opacity-50" : ""}
+								>
+									{isDeleteAllPending ? <LoadingSpinner /> : "Delete all notifications"}
+								</a>
 							</li>
 						</ul>
 					</div>
@@ -59,20 +62,26 @@ const NotificationPage = () => {
 				{notifications?.length === 0 && <div className='text-center p-4 font-bold'>No notifications 🤔</div>}
 				{notifications?.map((notification) => (
 					<div className='border-b border-gray-700' key={notification._id}>
-						<div className='flex gap-2 p-4'>
-							{notification.type === "follow" && <FaUser className='w-7 h-7 text-primary' />}
-							{notification.type === "like" && <FaHeart className='w-7 h-7 text-red-500' />}
-							<Link to={`/profile/${notification.from.username}`}>
-								<div className='avatar'>
-									<div className='w-8 rounded-full'>
-										<img src={notification.from.profileImg || "/avatar-placeholder.png"} />
+						<div className='flex justify-between items-center'>
+							<div className="flex gap-2 p-4">
+								{notification.type === "follow" && <FaUser className='w-7 h-7 text-primary' />}
+								{notification.type === "like" && <FaHeart className='w-7 h-7 text-red-500' />}
+								<Link to={`/profile/${notification.from.userName}`}>
+									<div className='avatar'>
+										<div className='w-8 rounded-full'>
+											<img src={notification.from.profileImage || "/avatar-placeholder.png"} />
+										</div>
 									</div>
-								</div>
-								<div className='flex gap-1'>
-									<span className='font-bold'>@{notification.from.username}</span>{" "}
-									{notification.type === "follow" ? "followed you" : "liked your post"}
-								</div>
-							</Link>
+									<div className='flex gap-1'>
+										<span className='font-bold'>@{notification.from.userName}</span>{" "}
+										{notification.type === "follow" ? "followed you" : "liked your post"}
+									</div>
+								</Link>
+							</div>
+							<div>
+								{isDeleteOnePending && loadingId === notification._id && <LoadingSpinner />}
+								{!isDeleteAllPending && loadingId !== notification._id && <MdDelete className="text-2xl mr-4 cursor-pointer hover:text-red-400" onClick={() => handleDeleteOne(notification._id)} />}
+							</div>
 						</div>
 					</div>
 				))}
