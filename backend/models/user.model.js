@@ -1,65 +1,68 @@
 import mongoose, { Schema, model } from "mongoose";
 
-const userSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  userName: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true,
-    minLength: 8,
-    maxLength: 128
-  },
+const userSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    userName: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minLength: 8,
+      maxLength: 128,
+    },
 
-  followers: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'User',
-    default: []
-  },
-
-  following: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'User',
-    default: []
-  },
-
-  profileImage: {
-    type: String,
-    default: ""
-  },
-  bio: {
-    type: String,
-    default: ""
-  },
-  bannerImage: {
-    type: String,
-    default: ""
-  },
-  link: {
-    type: String,
-    default: ""
-  },
-  likedPosts: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Post',
+    followers: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
       default: [],
-    }
-  ]
-}, {
-  timestamps: true
-})
+    },
 
-const User = model('User', userSchema)
+    following: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
+
+    profileImage: {
+      type: String,
+      default: "",
+    },
+    bio: {
+      type: String,
+      default: "",
+    },
+    bannerImage: {
+      type: String,
+      default: "",
+    },
+    link: {
+      type: String,
+      default: "",
+    },
+    likedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+        default: [],
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const User = model("User", userSchema);
 
 export default User;
